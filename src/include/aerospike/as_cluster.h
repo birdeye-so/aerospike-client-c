@@ -493,6 +493,12 @@ typedef struct as_cluster_s {
 	 */
 	uint32_t config_interval;
 
+	/**
+	 * @private
+	 * List of preferred nodes in cluster.
+	 */
+	as_vector* preferred_nodes;
+
 } as_cluster;
 
 struct aerospike_s;
@@ -524,6 +530,18 @@ as_cluster_is_connected(as_cluster* cluster);
  */
 void
 as_cluster_get_node_names(as_cluster* cluster, int* n_nodes, char** node_names);
+
+/**
+ * Does cluster has a preferred node.
+ */
+bool
+as_cluster_has_preferred_node(as_cluster* cluster);
+
+/**
+ * Is given node id preferred.
+ */
+bool
+as_cluster_is_preferred_node(as_cluster* cluster, const char *node_id);
 
 /**
  * Reserve reference counted access to cluster nodes.

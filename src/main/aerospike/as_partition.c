@@ -131,6 +131,25 @@ get_replica_master(as_partition* p)
 }
 
 static as_node*
+get_replica_preferred(as_cluster* cluster, as_partition* p, uint8_t replica_size, uint8_t replica_index)
+{
+	if (!as_cluster_has_preferred_node(cluster)) {
+		return NULL;
+	}
+
+	for (uint8_t i = 0; i < replica_size; ++i) {
+		uint8_t index = replica_index % replica_size;
+		as_node* node = as_node_load(&p->nodes[index]);
+
+		if (node && as_cluster_is_preferred_node(cluster, node->name) && as_node_is_active(node)) {
+			return node;
+		}
+		++replica_index;
+	}
+	return NULL;
+}
+
+static as_node*
 get_replica_sequence(as_partition* p, uint8_t replica_size, uint8_t* replica_index)
 {
 	for (uint8_t i = 0; i < replica_size; i++) {
@@ -216,6 +235,11 @@ as_partition_reg_get_node(
 	as_policy_replica replica, uint8_t replica_size, uint8_t* replica_index
 	)
 {
+	as_node* node = get_replica_preferred(cluster, p, replica_size, (*replica_index)++);
+	if (node != NULL) {
+		return node;
+	}
+
 	switch (replica) {
 		case AS_POLICY_REPLICA_MASTER:
 			return get_replica_master(p);

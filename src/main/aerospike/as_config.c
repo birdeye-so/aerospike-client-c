@@ -70,6 +70,7 @@ as_config_init(as_config* c)
 	c->shm_max_nodes = 16;
 	c->shm_max_namespaces = 8;
 	c->shm_takeover_threshold_sec = 30;
+	c->preferred_nodes = NULL;
 	return c;
 }
 
@@ -152,6 +153,16 @@ as_config_destroy(as_config* config) {
 	if (tls->certstring) {
 		cf_free(tls->certstring);
 	}
+}
+
+void
+as_config_add_preferred_node(as_config* config, const char* node_id)
+{
+	if (config->preferred_nodes == NULL) {
+		config->preferred_nodes = as_vector_create(sizeof(char*), 16);
+	}
+	char* node = cf_strdup(node_id);
+	as_vector_append(config->preferred_nodes, &node);
 }
 
 bool

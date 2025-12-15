@@ -859,6 +859,12 @@ typedef struct as_config_s {
 	 * Default: 30
 	 */
 	uint32_t shm_takeover_threshold_sec;
+
+	/**
+	 * @private
+	 * List of preferred nodes in cluster.
+	 */
+	as_vector* preferred_nodes;
 } as_config;
 
 //---------------------------------
@@ -892,6 +898,14 @@ as_config_init(as_config* config);
  */
 AS_EXTERN void
 as_config_destroy(as_config* config);
+
+/**
+ * Add a preferred node.
+ *
+ * @relates as_config
+ */
+AS_EXTERN void
+as_config_add_preferred_node(as_config* config, const char* node_id);
 
 /**
  * Add seed host(s) from a string with format: hostname1[:tlsname1][:port1],...

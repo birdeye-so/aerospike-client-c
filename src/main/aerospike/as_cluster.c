@@ -1317,6 +1317,23 @@ as_cluster_is_connected(as_cluster* cluster)
 	return connected;
 }
 
+bool
+as_cluster_has_preferred_node(as_cluster* cluster) {
+	return cluster->preferred_nodes != NULL && cluster->preferred_nodes->size > 0;
+}
+
+bool
+as_cluster_is_preferred_node(as_cluster* cluster, const char *node_id) {
+	as_vector* nodes = cluster->preferred_nodes;
+	for (int i = 0; i < nodes->size; ++i) {
+		const char** node_ptr = as_vector_get(nodes, i);
+		if (strcmp(*node_ptr, node_id) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void
 as_cluster_change_password(as_cluster* cluster, const char* user, const char* password, const char* password_hash)
 {
@@ -1769,6 +1786,8 @@ as_cluster_create(aerospike* as, as_error* err)
 		}
 		pthread_attr_destroy(&attr);
 	}
+
+	cluster->preferred_nodes = as->config.preferred_nodes;
 
 	as->cluster = cluster;
 	return AEROSPIKE_OK;
